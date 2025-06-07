@@ -1,0 +1,365 @@
+/* General Body Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa; /* Light grey background */
+
+}
+
+/* Main Content Area */
+main {
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50; /* Darker blue-grey for headings */
+}
+
+/* Links */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Cards (for clothing items, etc.) */
+.card {
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.card-img-top { /* General card image */
+    /* max-height: 250px; */ /* Overridden by .product-card .card-img-top */
+    object-fit: cover;
+}
+
+.product-card .card-img-top { /* Specific to product cards in sections */
+    height: 280px; /* Consistent height from inline style in home.html, good to have here */
+    object-fit: cover;
+    border-bottom: 1px solid #eee; /* Subtle separation */
+}
+
+.product-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes price/button to bottom */
+    padding: 1rem;
+}
+
+.product-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600; /* Slightly bolder */
+    margin-bottom: 0.5rem;
+}
+.product-card .card-title a {
+    color: #2c3e50; /* Match heading color */
+    text-decoration: none;
+}
+.product-card .card-title a:hover {
+    color: #007bff; /* Primary color on hover */
+}
+
+.product-card .card-text.small {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+.product-card .price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+
+/* Styles for Audience Section Cards from home.html (can be centralized here) */
+.audience-section .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    border: none; /* Cleaner look */
+}
+.audience-section .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important; /* Ensure override if Bootstrap has stronger shadow */
+}
+.audience-section .card img {
+    transition: transform 0.5s ease;
+    height: 350px; /* As defined in home.html style block */
+    object-fit: cover;
+}
+.audience-section .card:hover img {
+    transform: scale(1.1);
+}
+.audience-section .card-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+.audience-section .card:hover .card-title-overlay {
+    background: rgba(0,0,0,0.75);
+}
+
+
+/* Section Title Styling from home.html (can be centralized here) */
+.section-title {
+    text-align: center;
+    margin-bottom: 3rem !important; /* Increased specificity */
+    font-weight: bold;
+    color: #333;
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 2.25rem; /* Larger section titles */
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background-color: #007bff; /* Using primary color directly */
+}
+
+
+/* Hero Section Styling from home.html (can be centralized here) */
+.hero-section {
+    background: url('https://images.pexels.com/photos/325876/pexels-photo-325876.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center;
+    background-size: cover;
+    height: 60vh; /* As in home.html */
+    min-height: 400px; /* Minimum height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+    margin-bottom: 3rem !important; /* Ensure spacing */
+}
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5); /* As in home.html */
+}
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+.hero-content h1 {
+    font-size: 3.5rem; /* As in home.html */
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* As in home.html */
+    color: white; /* Ensure h1 color is white */
+}
+.hero-content p {
+    font-size: 1.25rem; /* As in home.html */
+    margin-bottom: 2rem;
+}
+
+
+/* Footer (if you add one later) */
+/*
+footer {
+    padding: 20px 0;
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+}
+*/
+
+/* AR Try-On Area Specifics from clothing_detail.html */
+#ar-try-on-area {
+    background-color: #e9ecef; /* Slightly darker than page background */
+    border: 1px dashed #ced4da;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 450px; /* Ensure it has some height */
+    position: relative; /* For absolute positioning of canvas/video */
+    overflow: hidden; /* To contain video/canvas if they overflow */
+}
+
+#ar-try-on-area p.text-muted,
+#ar-try-on-area p.text-success {
+    font-size: 1.1rem;
+}
+
+/* Ensure video/canvas fill the AR area if used */
+#ar-try-on-area video,
+#ar-try-on-area canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the area, might crop */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    body {
+        margin-top: 56px; /* Adjust for smaller navbar */
+    }
+    .col-md-6 { /* Stack columns on smaller screens */
+        margin-bottom: 30px;
+    }
+    #ar-try-on-area {
+        min-height: 350px;
+    }
+}
+/* Product Detail Page Specific Styles */
+.product-detail-page .product-media-container .product-image-main {
+  max-height: 550px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: .5rem;
+}
+.col-md-10.col-lg-8 {
+  padding: 100px 100px inherit;
+  right: -218px;
+  position: relative;
+ 
+}
+.virtual-try-on-box {
+  border: 2px dotted #ccc;
+}
+.virtual-try-on-box.p-4.rounded.shadow-sm.text-center {
+  width: 600px;
+  height: 350px;
+}
+
+.product-detail-page .product-title {
+  color: #212529; /* Darker for emphasis */
+}
+
+.product-detail-page .product-price {
+  color: #007bff; /* Primary color for price */
+}
+
+.product-detail-page .product-description h5 {
+  font-size: 1.1rem;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.product-detail-page .size-btn {
+  min-width: 40px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+.product-detail-page .size-btn.active {
+  background-color: #343a40;
+  color: white;
+  border-color: #343a40;
+}
+
+.product-detail-page .input-group .form-control {
+  text-align: center;
+  border-left: none;
+  border-right: none;
+}
+.product-detail-page .input-group .btn {
+  border-color: #ced4da; /* Match form control border */
+}
+.product-detail-page .input-group .btn:hover {
+  background-color: #e9ecef;
+}
+
+
+.product-detail-page #buyNowButton {
+  background-color: #28a745; /* Green for Buy Now */
+  border-color: #28a745;
+  font-weight: 600;
+}
+.product-detail-page #buyNowButton:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.product-detail-page #addToCartButton {
+  font-weight: 500;
+}
+
+.product-detail-page #tryOnButton {
+  background-color: #17a2b8; /* Info blue */
+  border-color: #17a2b8;
+  color: white;
+  font-weight: 500;
+}
+.product-detail-page #tryOnButton:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+}
+
+.product-detail-page .product-meta ul li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.product-detail-page .product-meta ul li i {
+  width: 20px; /* Ensure icons align well */
+  text-align: center;
+}
+
+/* Sticky behavior for product media on larger screens */
+@media (min-width: 992px) {
+  .product-media-container.sticky-top {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 80px; /* Adjust based on your navbar height */
+    z-index: 1000; /* Below navbar if navbar is higher */
+  }
+}
+
+/* Model viewer specific styling */
+#ar-try-on-area model-viewer {
+  border-radius: .25rem; /* Match other rounded elements */
+}
+
+#ar-try-on-area #ar-button {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+#ar-try-on-area #ar-button:hover {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Ensure Font Awesome icons are styled if not globally done */
+.fas {
+  line-height: inherit; /* Helps with vertical alignment */
+}

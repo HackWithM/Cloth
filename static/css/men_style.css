@@ -1,0 +1,93 @@
+/* Gradient heading text */
+.text-gradient {
+    background: linear-gradient(to right, #00b4db, #0083b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Product card container */
+.product-card {
+    background-color: #fff;
+    border-radius: 1rem;
+    padding: 20px;
+    transition: transform 0.4s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* 3D hover effect */
+.hover-3d:hover {
+    transform: scale(1.03) rotateY(3deg) rotateX(3deg);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Product image styling */
+.product-card img {
+    max-height: 300px;
+    object-fit: contain;
+    transition: transform 0.4s ease, filter 0.3s ease;
+    border-radius: 0.75rem;
+    margin-bottom: 15px;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+    filter: brightness(105%);
+}
+
+/* Product name styling */
+.product-card h5 {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Product price styling */
+.product-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 0.75rem;
+}
+
+/* Try-on button */
+.product-card a.btn {
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.product-card a.btn:hover {
+    background-color: #0083b0;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* Badge for "New", "Sale" etc. */
+.product-badge {
+    display: inline-block;
+    background-color: #ff5e57;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 50px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+/* Card layout enhancements */
+@media (max-width: 768px) {
+    .product-card {
+        transform: none !important;
+    }
+
+    .product-card img {
+        max-height: 200px;
+    }
+}

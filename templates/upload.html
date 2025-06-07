@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Virtual Try-On{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Virtual Try-On AI</h1>
+    <p>Upload your photo to virtually try on the selected clothing item.</p>
+
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'virtual_try_on_ai' item_id=item.id %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="person_image" class="form-label">Your Image (Upload a photo of yourself):</label>
+            <input type="file" class="form-control" id="person_image" name="person_image" accept="image/*" required>
+        </div>
+
+        {% if item %}
+        <div class="mb-3">
+            <h4>You are trying on:</h4>
+            <div class="card" style="width: 18rem;">
+                {% if item.image_2d %}
+                <img src="{{ item.image_2d.url }}" class="card-img-top" alt="{{ item.name }}">
+                {% else %}
+                <div class="card-img-top text-center py-5 bg-light">
+                    <p class="text-muted">No image available</p>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">{{ item.description|truncatewords:15 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Fit Clothing with AI</button>
+    </form>
+</div>
+{% endblock %}

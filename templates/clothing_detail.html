@@ -1,0 +1,513 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container product-detail-page py-5">
+  <div class="row">
+    <!-- Left Column: Main Product Image -->
+    <div class="col-lg-3 mb-4 mb-lg-0">
+      <div class="product-media-container sticky-top" style="top: 80px;">
+        {% if item.image_2d and item.image_2d.url %}
+          <img src="{{ item.image_2d.url }}" alt="{{ item.name }}" class="img-fluid rounded shadow-sm product-image-main">
+        {% else %}
+          <img src="{% static 'images/placeholder_product.png' %}" alt="Placeholder for {{ item.name }}" class="img-fluid rounded shadow-sm product-image-main" style="background-color: #eee;">
+        {% endif %}
+      </div>
+    </div>
+<!-- Virtual Try-On Box -->
+    
+    <div class="col-lg-5">
+       <div class="row mt-5 justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="virtual-try-on-box  p-4 rounded shadow-sm text-center" >
+
+        <h3 class="mb-4 fw-semibold">Virtual Try-On Studio</h3>
+        
+        <button id="tryOnButton" class="btn btn-info btn-lg w-auto mb-3">
+          <i class="fas fa-street-view me-2"></i>Try It On Virtually
+        </button>
+
+        <!-- Area to display the user's uploaded image -->
+        <div id="userImageDisplayArea" class="mt-3 mb-3" style="display:none;">
+          <h5 class="mb-2">Your Image:</h5>
+          <img id="userUploadedImageDisplay" src="#" alt="Your Uploaded Image" class="img-fluid rounded shadow" style="max-height: 350px; border: 1px solid #ddd;">
+          <button id="applyAiButton" class="btn btn-success mt-2" style="display:none;">Fit Clothing with AI <i class="fas fa-magic ms-2"></i></button>
+        </div>
+
+        <!-- Area to display the AI processed image -->
+        <div id="aiProcessedImageArea" class="mt-4 mb-3 text-center" style="display:none;">
+          <h5 class="mb-2">Virtually Tried On:</h5>
+          <img id="aiProcessedImageDisplay" src="#" alt="AI Processed Image" class="img-fluid rounded shadow" style="max-height: 400px; border: 1px solid #ddd;">
+        </div>
+
+        <!-- 3D Model Viewer Area -->
+        {% if item.model_3d_file and item.model_3d_file.url %}
+          <div id="ar-try-on-area" class="border rounded bg-light d-flex align-items-center justify-content-center mt-3" style="min-height: 400px; position: relative;">
+            <model-viewer
+              id="modelViewerElement"
+              src="{{ item.model_3d_file.url }}"
+              alt="3D model of {{ item.name }}"
+              ar
+              ar-modes="webxr scene-viewer quick-look"
+              camera-controls
+              autoplay
+              style="width: 100%; height: 400px; background-color: #f8f9fa;"
+              shadow-intensity="1"
+              exposure="1">
+              <div class="progress-bar hide" slot="progress-bar"><div class="update-bar"></div></div>
+              <button slot="ar-button" id="ar-button" class="btn btn-outline-primary btn-sm m-2">
+                  View in your space <i class="fas fa-vr-cardboard"></i>
+              </button>
+            </model-viewer>
+          </div>
+          <div class="text-center mt-2 mb-3">
+            <button class="btn btn-outline-secondary btn-sm" id="captureSnapshotButton" style="display:none;">Capture Snapshot 📸</button>
+          </div>
+        {% else %}
+          <p class="mt-3 text-muted small">3D Model for AR Try-On not yet available for this item.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Right Column: Product Information and Actions -->
+    <div class="col-lg-6" style="margin-top: 100px;">
+ <h1 class="product-title display-5 fw-bold mb-2">{{ item.name }}</h1>
+      {% if item.brand %}
+        <p class="text-muted mb-2">Brand: <span class="fw-medium">{{ item.brand }}</span></p>
+      {% endif %}
+      <p class="text-muted mb-3">Category: {{ item.get_category_display }}</p>
+
+      {% if item.price %}
+        <p class="product-price fs-2 fw-bold text-primary mb-3">₹{{ item.price }}</p>
+      {% endif %}
+
+      {% if item.description %}
+        <div class="product-description mb-4">
+          <h5 class="fw-semibold">Description:</h5>
+          <p>{{ item.description|linebreaksbr }}</p>
+        </div>
+      {% endif %}
+
+      {% if item.sizes_available %}
+        <div class="mb-3">
+          <h5 class="fw-semibold mb-2">Available Sizes:</h5>
+          {% for size in item.sizes_available|split:',' %}
+            <button type="button" class="btn btn-outline-secondary btn-sm me-1 mb-1 size-btn">{{ size|trim }}</button>
+          {% endfor %}
+          <input type="hidden" id="selectedSize" name="selected_size">
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <h5 class="fw-semibold mb-2">Quantity:</h5>
+        <div class="input-group" style="max-width: 150px;">
+          <button class="btn btn-outline-secondary" type="button" id="quantity-minus">-</button>
+          <input type="text" class="form-control text-center" value="1" id="quantity-input" aria-label="Quantity">
+          <button class="btn btn-outline-secondary" type="button" id="quantity-plus">+</button>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mb-3">
+        <button class="btn btn-primary btn-lg" id="buyNowButton">
+          <i class="fas fa-shopping-bag me-2"></i>Buy Now
+        </button>
+        <button class="btn btn-outline-primary btn-lg" id="addToCartButton">
+          <i class="fas fa-cart-plus me-2"></i>Add to Cart
+        </button>
+      </div>
+      
+      <hr class="my-4">
+
+      <div class="product-meta">
+        <h5 class="fw-semibold mb-2">Additional Details:</h5>
+        <ul class="list-unstyled text-muted small">
+          {% if item.color %}
+            <li><i class="fas fa-palette me-2"></i>Color: {{ item.color }}</li>
+          {% endif %}
+          {% if item.material %}
+            <li><i class="fas fa-gem me-2"></i>Material: {{ item.material }}</li>
+          {% endif %}
+          <li><i class="fas fa-check-circle me-2 text-success"></i>In Stock</li>
+          <li><i class="fas fa-truck me-2"></i>Standard Shipping (3-5 days)</li>
+        </ul>
+      </div>
+    </div>
+</div>
+  <!-- Modal for Virtual Try-On Image Selection -->
+  <div class="modal fade" id="virtualTryOnModal" tabindex="-1" aria-labelledby="virtualTryOnModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="virtualTryOnModalLabel">Prepare for Virtual Try-On</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Important Instructions:</h5>
+            <p>For the best virtual try-on experience, please use a **full-body photo** where you are standing straight and clearly visible from head to feet. Ensure good lighting.</p>
+          </div>
+
+          <div class="mb-3">
+            <label for="userImageUpload" class="form-label">1. Upload your full-body photo:</label>
+            <input class="form-control" type="file" id="userImageUpload" accept="image/*">
+          </div>
+          <div class="text-center my-3">
+            <p class="mb-1">Or</p>
+            <button class="btn btn-secondary" id="useCameraButton"><i class="fas fa-camera"></i> 2. Use Camera to take a full-body photo</button>
+          </div>
+          
+          <div class="try-on-preview-area text-center border rounded p-2 mb-3" style="min-height: 300px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+            <img id="imagePreviewModal" src="#" alt="Image Preview" style="max-width: 100%; max-height: 350px; display: none;">
+            <video id="videoPreviewModal" autoplay playsinline style="max-width: 100%; max-height: 350px; display: none;"></video>
+            <canvas id="snapshotCanvasModal" style="display:none;"></canvas>
+            <p id="previewPlaceholderModal" class="text-muted">Image preview or camera feed will appear here.</p>
+          </div>
+          <div class="text-center mt-2" id="snapshotButtonContainer" style="display:none;">
+            <button class="btn btn-info" id="takeSnapshotButtonModal">Take Snapshot</button>
+          </div>
+
+          <div id="confirmationAreaModal" class="mt-3 p-3 border rounded bg-light" style="display:none;">
+            <h5 class="fw-semibold">3. Confirmation:</h5>
+            <p class="small text-muted">Is the photo above a clear, well-lit, full-body image of you (head to feet)?</p>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="isFullBodyConfirmationCheckbox">
+              <label class="form-check-label" for="isFullBodyConfirmationCheckbox">
+                Yes, I confirm this is a suitable full-body photo.
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="useThisImageButtonModal" disabled>Use This Image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tryOnButton = document.getElementById('tryOnButton');
+  const modelViewerElement = document.getElementById('modelViewerElement');
+  const captureSnapshotButton = document.getElementById('captureSnapshotButton'); // This is for model-viewer snapshot
+  const arTryOnArea = document.getElementById('ar-try-on-area');
+
+  // New Modal Elements
+  const virtualTryOnModal = new bootstrap.Modal(document.getElementById('virtualTryOnModal'));
+  const userImageUploadInput = document.getElementById('userImageUpload');
+  const useCameraButton = document.getElementById('useCameraButton');
+  const imagePreviewModal = document.getElementById('imagePreviewModal');
+  const videoPreviewModal = document.getElementById('videoPreviewModal');
+  const snapshotCanvasModal = document.getElementById('snapshotCanvasModal');
+  const snapshotButtonContainer = document.getElementById('snapshotButtonContainer');
+  const takeSnapshotButtonModal = document.getElementById('takeSnapshotButtonModal');
+  const useThisImageButtonModal = document.getElementById('useThisImageButtonModal');
+  const previewPlaceholderModal = document.getElementById('previewPlaceholderModal');
+  const confirmationAreaModal = document.getElementById('confirmationAreaModal');
+  const isFullBodyConfirmationCheckbox = document.getElementById('isFullBodyConfirmationCheckbox');
+
+  // Main page display area for user's image
+  const userImageDisplayArea = document.getElementById('userImageDisplayArea');
+  const userUploadedImageDisplay = document.getElementById('userUploadedImageDisplay');
+  const applyAiButton = document.getElementById('applyAiButton'); // New button
+  const aiProcessedImageArea = document.getElementById('aiProcessedImageArea'); // New display area
+  const aiProcessedImageDisplay = document.getElementById('aiProcessedImageDisplay'); // New image element
+
+  let stream; // To store camera stream
+
+  // Size selection
+  const sizeButtons = document.querySelectorAll('.size-btn');
+  const selectedSizeInput = document.getElementById('selectedSize');
+  sizeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      sizeButtons.forEach(btn => btn.classList.remove('active', 'btn-dark'));
+      this.classList.add('active', 'btn-dark');
+      selectedSizeInput.value = this.textContent;
+      console.log('Selected size:', selectedSizeInput.value);
+    });
+  });
+
+  // Quantity selection
+  const quantityInput = document.getElementById('quantity-input');
+  const quantityPlus = document.getElementById('quantity-plus');
+  const quantityMinus = document.getElementById('quantity-minus');
+
+  quantityPlus.addEventListener('click', function() {
+    let currentVal = parseInt(quantityInput.value);
+    if (!isNaN(currentVal)) {
+      quantityInput.value = currentVal + 1;
+    } else {
+      quantityInput.value = 1;
+    }
+  });
+
+  quantityMinus.addEventListener('click', function() {
+    let currentVal = parseInt(quantityInput.value);
+    if (!isNaN(currentVal) && currentVal > 1) {
+      quantityInput.value = currentVal - 1;
+    } else {
+      quantityInput.value = 1;
+    }
+  });
+
+
+  // Stop camera stream if modal is closed
+  document.getElementById('virtualTryOnModal').addEventListener('hidden.bs.modal', function () {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      videoPreviewModal.style.display = 'none';
+      snapshotButtonContainer.style.display = 'none';
+    }
+    imagePreviewModal.style.display = 'none';
+    previewPlaceholderModal.style.display = 'block';
+    confirmationAreaModal.style.display = 'none';
+    isFullBodyConfirmationCheckbox.checked = false;
+    useThisImageButtonModal.disabled = true;
+    userImageUploadInput.value = ''; // Reset file input
+  });
+
+
+  if (tryOnButton) {
+      tryOnButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        // Now, this button opens the modal for image selection/capture
+        virtualTryOnModal.show();
+        // Optionally, you can still scroll to the AR area if a 3D model exists,
+        // but the primary action is now the modal.
+        // if (modelViewerElement) {
+        //   modelViewerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // }
+      });
+  }
+
+  userImageUploadInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreviewModal.src = e.target.result;
+        imagePreviewModal.style.display = 'block';
+        videoPreviewModal.style.display = 'none';
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        snapshotButtonContainer.style.display = 'none';
+        previewPlaceholderModal.style.display = 'none';
+        confirmationAreaModal.style.display = 'block';
+        isFullBodyConfirmationCheckbox.checked = false; // Reset checkbox
+        checkCanUseImage();
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  useCameraButton.addEventListener('click', async function() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      videoPreviewModal.srcObject = stream;
+      videoPreviewModal.style.display = 'block';
+      imagePreviewModal.style.display = 'none';
+      snapshotButtonContainer.style.display = 'block';
+      previewPlaceholderModal.style.display = 'none';
+      confirmationAreaModal.style.display = 'none';
+      isFullBodyConfirmationCheckbox.checked = false;
+      checkCanUseImage();
+    } catch (err) {
+      console.error("Error accessing camera: ", err);
+      alert("Could not access the camera. Please ensure permissions are granted.");
+      previewPlaceholderModal.textContent = "Could not access camera.";
+      previewPlaceholderModal.style.display = 'block';
+      snapshotButtonContainer.style.display = 'none';
+    }
+  });
+
+  takeSnapshotButtonModal.addEventListener('click', function() {
+    if (stream && videoPreviewModal.readyState === videoPreviewModal.HAVE_ENOUGH_DATA) {
+      snapshotCanvasModal.width = videoPreviewModal.videoWidth;
+      snapshotCanvasModal.height = videoPreviewModal.videoHeight;
+      const context = snapshotCanvasModal.getContext('2d');
+      context.drawImage(videoPreviewModal, 0, 0, snapshotCanvasModal.width, snapshotCanvasModal.height);
+      imagePreviewModal.src = snapshotCanvasModal.toDataURL('image/png');
+      imagePreviewModal.style.display = 'block';
+      videoPreviewModal.style.display = 'none';
+      stream.getTracks().forEach(track => track.stop());
+      snapshotButtonContainer.style.display = 'none';
+      confirmationAreaModal.style.display = 'block';
+      isFullBodyConfirmationCheckbox.checked = false;
+      checkCanUseImage();
+    }
+  });
+
+  isFullBodyConfirmationCheckbox.addEventListener('change', checkCanUseImage);
+
+  function checkCanUseImage() {
+    const imageAvailable = imagePreviewModal.src && imagePreviewModal.src !== '#' && imagePreviewModal.style.display === 'block';
+    const confirmedFullBody = isFullBodyConfirmationCheckbox.checked;
+    useThisImageButtonModal.disabled = !(imageAvailable && confirmedFullBody);
+  }
+
+  useThisImageButtonModal.addEventListener('click', function() {
+    if (imagePreviewModal.src && imagePreviewModal.src !== '#' && imagePreviewModal.style.display === 'block' && isFullBodyConfirmationCheckbox.checked) {
+      userUploadedImageDisplay.src = imagePreviewModal.src;
+      userImageDisplayArea.style.display = 'block'; // Show the area on main page
+      applyAiButton.style.display = 'block'; // Show the new AI button
+      aiProcessedImageArea.style.display = 'none'; // Ensure AI image area is hidden initially
+      virtualTryOnModal.hide();
+      userImageDisplayArea.scrollIntoView({ behavior: 'smooth' });
+    } else if (!isFullBodyConfirmationCheckbox.checked) {
+      alert("Please confirm that the uploaded image is a suitable full-body photo by checking the box.");
+    } else {
+      alert("No image selected or captured to use.");
+    }
+  });
+
+
+  if (modelViewerElement) {
+    modelViewerElement.addEventListener('load', () => {
+      console.log('3D Model loaded successfully for {{ item.name }}');
+      if(captureSnapshotButton) captureSnapshotButton.style.display = 'inline-block'; // Show snapshot button
+    });
+
+    modelViewerElement.addEventListener('error', (event) => {
+      console.error('Error loading 3D Model:', event.detail);
+      if (arTryOnArea) {
+        arTryOnArea.innerHTML = '<p class="text-danger p-3">Could not load 3D model. Please ensure the file path is correct and the model is valid.</p>';
+      }
+    });
+  } else {
+      // If there's no model viewer, but there is an AR area, ensure snapshot button is hidden
+      if(captureSnapshotButton) captureSnapshotButton.style.display = 'none';
+  }
+
+  if (captureSnapshotButton) {
+      captureSnapshotButton.addEventListener('click', async function() {
+        if (modelViewerElement) {
+          try {
+            const blob = await modelViewerElement.toBlob({mimeType: 'image/png'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '{{item.name|slugify}}_try_on_snapshot.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log("Snapshot captured and download initiated!");
+          } catch (e) {
+            console.error("Could not capture snapshot:", e);
+            alert("Failed to capture snapshot.");
+          }
+        } else {
+          alert("3D model not loaded, cannot capture snapshot.");
+        }
+      });
+  }
+
+  // Add to Cart and Buy Now button functionality (placeholders)
+  const addToCartButton = document.getElementById('addToCartButton');
+  const buyNowButton = document.getElementById('buyNowButton');
+
+  if(addToCartButton) {
+    addToCartButton.addEventListener('click', function() {
+      const size = selectedSizeInput.value;
+      const quantity = quantityInput.value;
+      if (sizeButtons.length > 0 && !size) {
+        alert('Please select a size.');
+        return;
+      }
+      // Placeholder: Implement actual add to cart logic
+      alert(`Added to cart: ${quantity} x {{ item.name }} ${size ? '(Size: ' + size + ')' : ''}`);
+      console.log('Add to cart:', { itemId: '{{ item.id }}', name: '{{item.name}}', quantity: quantity, size: size });
+    });
+  }
+
+  if(buyNowButton) {
+    buyNowButton.addEventListener('click', function() {
+      const size = selectedSizeInput.value;
+      const quantity = quantityInput.value;
+      if (sizeButtons.length > 0 && !size) {
+        alert('Please select a size.');
+        return;
+      }
+      // Placeholder: Implement actual buy now logic (e.g., redirect to checkout)
+      alert(`Proceeding to buy: ${quantity} x {{ item.name }} ${size ? '(Size: ' + size + ')' : ''}`);
+      console.log('Buy now:', { itemId: '{{ item.id }}', name: '{{item.name}}', quantity: quantity, size: size });
+    });
+  }
+
+  // Event listener for the new "Apply AI" button
+  if (applyAiButton) {
+    applyAiButton.addEventListener('click', async function() {
+      const userImageDataUrl = userUploadedImageDisplay.src;
+      const itemId = '{{ item.id }}'; // Get item_id from Django template
+      const csrftoken = getCookie('csrftoken');
+      if (!userImageDataUrl || userImageDataUrl === '#') {
+        alert('Please upload or select an image first.');
+        return;
+      }
+
+      // Show some loading indicator if you have one
+      applyAiButton.disabled = true;
+      applyAiButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+     function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+      try {
+        const response = await fetch(`/virtual-try-on-ai/${itemId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
+
+            // 'X-CSRFToken': '{{ csrf_token }}', // Django's CSRF token if not using @csrf_exempt
+          },
+          body: JSON.stringify({
+            user_image_data_url: userImageDataUrl
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          aiProcessedImageDisplay.src = result.processed_image_url;
+          aiProcessedImageArea.style.display = 'block';
+          aiProcessedImageArea.scrollIntoView({ behavior: 'smooth' });
+          alert(result.message || 'Image processed successfully!');
+        } else {
+          console.error('AI Processing Error:', result.message);
+          alert('Error processing image: ' + (result.message || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        alert('An error occurred while communicating with the server.');
+      } finally {
+        applyAiButton.disabled = false;
+        applyAiButton.innerHTML = 'Fit Clothing with AI <i class="fas fa-magic ms-2"></i>';
+      }
+    });
+  }
+
+});
+
+</script>
+{% endblock %}
+
+{% endblock %}

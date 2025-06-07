@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TryFit - Virtual Try-On Fashion{% endblock %}
+
+{% block styles %}
+{{ block.super }} <!-- Include styles from base.html if any -->
+<style>
+  .hero-section {
+    background: url('https://images.pexels.com/photos/325876/pexels-photo-325876.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center;
+    background-size: cover;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+  }
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  .hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  }
+  .hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .audience-section .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden; 
+  }
+  .audience-section .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+  }
+  .audience-section .card img {
+    transition: transform 0.5s ease;
+    height: 350px;
+    object-fit: cover;
+  }
+  .audience-section .card:hover img {
+    transform: scale(1.1);
+  }
+  .audience-section .card-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-weight: bold;
+    color: #333;
+    position: relative;
+    padding-bottom: 10px;
+  }
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background-color: var(--bs-primary); 
+  }
+
+  .product-card .card-img-top, 
+  .product-card model-viewer { /* Apply height to model-viewer as well */
+    height: 280px; 
+    object-fit: cover;
+    width: 100%;
+    background-color: #f8f9fa; /* Light background for model viewer */
+    border-bottom: 1px solid #eee; /* Add a border to the media container */
+  }
+   .product-card .product-card-media-link { /* Ensure the link covers the media area */
+    display: block;
+    height: 280px; /* Match media height */
+    overflow: hidden; /* Clip content if model-viewer is slightly larger */
+  }
+  .product-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem; /* Ensure padding is consistent */
+  }
+  .product-card .stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+  }
+  .progress-bar-custom { /* Basic styling for model-viewer progress bar */
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #eee;
+    overflow: hidden;
+  }
+  .progress-bar-custom::bar {
+      background-color: var(--bs-primary);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section mb-5">
+  <div class="hero-content">
+    <h1>Discover Your Style, Virtually</h1>
+    <p>Experience the future of fashion with our Virtual Try-On technology.</p>
+    <a href="{% url 'all_clothes' %}" class="btn btn-primary btn-lg">Shop All Collections</a>
+  </div>
+</section>
+
+<!-- Shop by Audience Section -->
+<section class="container audience-section mb-5">
+  <h2 class="section-title">Shop Now Up To 20% Off</h2>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <a href="{% url 'mens_clothes' %}" class="text-decoration-none">
+        <div class="card text-white border-0 shadow-sm">
+          <img src="https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="card-img" alt="Men's Fashion">
+          <div class="card-title-overlay">Men's Collection</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% url 'womens_clothes' %}" class="text-decoration-none">
+        <div class="card text-white border-0 shadow-sm">
+          <img src="https://img.kwcdn.com/product/1d14c6c1592/ae1fc458-5194-48ad-923c-7ffbca0cb525_1343x1791.jpeg.a.jpg" class="card-img" alt="Women's Fashion">
+          <div class="card-title-overlay">Women's Collection</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% url 'kids_clothes' %}" class="text-decoration-none">
+        <div class="card text-white border-0 shadow-sm">
+          <img src="https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="card-img" alt="Kids' Fashion">
+          <div class="card-title-overlay">Kids' Collection</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals Section -->
+<section class="container mb-5">
+  <h2 class="section-title">New Arrivals</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% if new_arrivals %}
+      {% for item in new_arrivals %}
+        {% include "partials/product_card.html" with item=item %}
+      {% endfor %}
+    {% else %}
+      <div class="col-12"><p class="text-center text-muted">No new arrivals yet. Stay tuned!</p></div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Best Sellers Section -->
+<section class="container mb-5">
+  <h2 class="section-title">Our Best Sellers</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% if best_sellers %}
+      {% for item in best_sellers %}
+        {% include "partials/product_card.html" with item=item %}
+      {% endfor %}
+    {% else %}
+      <div class="col-12"><p class="text-center text-muted">Discover our best sellers soon!</p></div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Featured Items (Trending Now) Section -->
+<section class="container mb-5">
+  <h2 class="section-title">Trending Now</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% if featured_items %}
+      {% for item in featured_items %}
+        {% include "partials/product_card.html" with item=item %}
+      {% endfor %}
+    {% else %}
+      <div class="col-12"><p class="text-center text-muted">No trending items right now.</p></div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="container-fluid bg-light py-5">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-3">JOIN OUR NEWSLETTER</h2>
+    <p class="mb-4">Subscribe to get updates on new arrivals, special offers and more.</p>
+    <form class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="email" class="form-control form-control-lg" placeholder="Your email address" required>
+          <button class="btn btn-primary btn-lg" type="submit">Subscribe</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Placeholder for any future JS enhancements for the home page
+  });
+</script>
+{% endblock %}

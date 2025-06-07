@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Men's Clothing - Virtual Try-On{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Men's Collection</h1>
+    <div class="row">
+        {% if clothes %}
+            {% for item in clothes %}
+                 <div class="col-md-3 mb-4">
+                    {% include "partials/product_card.html" with product=item %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col">
+                <p class="text-center">No men's clothing items found at the moment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+ 

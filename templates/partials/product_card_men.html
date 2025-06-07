@@ -1,0 +1,11 @@
+<div class="position-relative text-center">
+    <!-- Optional badge -->
+    {% if product.is_new %}
+        <span class="product-badge">New</span>
+    {% endif %}
+
+    <img src="{{ product.image.url }}" class="img-fluid rounded mb-3" alt="{{ product.name }}">
+    <h5 class="fw-semibold">{{ product.name }}</h5>
+    <p class="text-muted">₹{{ product.price }}</p>
+    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary rounded-pill mt-2">Try On</a>
+</div>

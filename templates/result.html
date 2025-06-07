@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Virtual Try-On Result{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Virtual Try-On Result</h1>
+
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+        <p>Please <a href="{% url 'virtual_try_on_ai' %}">try again</a>.</p>
+    {% elif output_img %}
+        <div class="text-center">
+            <h2>Here's your virtual try-on!</h2>
+            <img src="{{ output_img }}" alt="Virtual Try-On Result" class="img-fluid" style="max-width: 500px; border: 1px solid #ddd; margin-bottom: 20px;">
+        </div>
+        <p class="text-center"><a href="{% url 'virtual_try_on_ai' %}" class="btn btn-secondary">Try Another Item</a></p>
+    {% else %}
+        <p>Something went wrong. No image to display.</p>
+        <p>Please <a href="{% url 'virtual_try_on_ai' %}">try again</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
